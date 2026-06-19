@@ -4,6 +4,10 @@ Aplicação web standalone que acompanha as condições climáticas das principa
 
 ## 🚀 Como usar
 
+**🌐 Acesse online:** [talitatech.github.io/clima-tempo-gen](https://talitatech.github.io/clima-tempo-gen/)
+
+Ou localmente:
+
 1. **Abra o arquivo** `index.html` em qualquer navegador moderno
 2. Os dados carregam automaticamente — **sem necessidade de chave API**
 3. Use os filtros na barra de status para ver cidades por nível de risco
