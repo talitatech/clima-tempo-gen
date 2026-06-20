@@ -1,27 +1,68 @@
 const CIDADES = [
-    { nome: 'São Paulo', lat: -23.5505, lon: -46.6333 },
-    { nome: 'Rio de Janeiro', lat: -22.9068, lon: -43.1729 },
-    { nome: 'Belo Horizonte', lat: -19.9167, lon: -43.9345 },
-    { nome: 'Porto Alegre', lat: -30.0346, lon: -51.2177 },
-    { nome: 'Recife', lat: -8.0476, lon: -34.8770 },
-    { nome: 'Manaus', lat: -3.1190, lon: -60.0217 },
-    { nome: 'Brasília', lat: -15.7975, lon: -47.8919 },
-    { nome: 'Salvador', lat: -12.9714, lon: -38.5014 },
-    { nome: 'Fortaleza', lat: -3.7172, lon: -38.5433 },
-    { nome: 'Curitiba', lat: -25.4290, lon: -49.2671 },
-    { nome: 'Goiânia', lat: -16.6864, lon: -49.2643 },
-    { nome: 'Belém', lat: -1.4558, lon: -48.4902 },
-    { nome: 'Campinas', lat: -22.9055, lon: -47.0608 },
-    { nome: 'São Luís', lat: -2.5387, lon: -44.3025 },
-    { nome: 'Natal', lat: -5.7945, lon: -35.2110 },
-    { nome: 'Cuiabá', lat: -15.6010, lon: -56.0974 },
+    { nome: 'Rio Branco',    lat: -9.9740,  lon: -67.8076 },
+    { nome: 'Maceió',        lat: -9.6498,  lon: -35.7089 },
+    { nome: 'Macapá',        lat: 0.0355,   lon: -51.0705 },
+    { nome: 'Manaus',        lat: -3.1190,  lon: -60.0217 },
+    { nome: 'Salvador',      lat: -12.9714, lon: -38.5014 },
+    { nome: 'Fortaleza',     lat: -3.7172,  lon: -38.5433 },
+    { nome: 'Brasília',      lat: -15.7975, lon: -47.8919 },
+    { nome: 'Vitória',       lat: -20.3155, lon: -40.3128 },
+    { nome: 'Goiânia',       lat: -16.6864, lon: -49.2643 },
+    { nome: 'São Luís',      lat: -2.5387,  lon: -44.3025 },
+    { nome: 'Cuiabá',        lat: -15.6010, lon: -56.0974 },
+    { nome: 'Campo Grande',  lat: -20.4697, lon: -54.6201 },
+    { nome: 'Belo Horizonte',lat: -19.9167, lon: -43.9345 },
+    { nome: 'Belém',         lat: -1.4558,  lon: -48.4902 },
+    { nome: 'João Pessoa',   lat: -7.1150,  lon: -34.8640 },
+    { nome: 'Curitiba',      lat: -25.4290, lon: -49.2671 },
+    { nome: 'Recife',        lat: -8.0476,  lon: -34.8770 },
+    { nome: 'Teresina',      lat: -5.0920,  lon: -42.8033 },
+    { nome: 'Rio de Janeiro',lat: -22.9068, lon: -43.1729 },
+    { nome: 'Natal',         lat: -5.7945,  lon: -35.2110 },
+    { nome: 'Porto Alegre',  lat: -30.0346, lon: -51.2177 },
+    { nome: 'Porto Velho',   lat: -8.7619,  lon: -63.9039 },
+    { nome: 'Boa Vista',     lat: 2.8235,   lon: -60.6758 },
     { nome: 'Florianópolis', lat: -27.5954, lon: -48.5482 },
-    { nome: 'João Pessoa', lat: -7.1150, lon: -34.8640 },
-    { nome: 'Campo Grande', lat: -20.4697, lon: -54.6201 },
-    { nome: 'Teresina', lat: -5.0920, lon: -42.8033 },
-    { nome: 'Aracaju', lat: -10.9472, lon: -37.0731 },
-    { nome: 'Vitória', lat: -20.3155, lon: -40.3128 }
+    { nome: 'São Paulo',     lat: -23.5505, lon: -46.6333 },
+    { nome: 'Aracaju',       lat: -10.9472, lon: -37.0731 },
+    { nome: 'Palmas',        lat: -10.1841, lon: -48.3333 }
 ];
+
+const CAPITAL_MESOREGIOES = {
+    'Rio Branco':      ['Vale do Acre', 'Vale do Juruá'],
+    'Maceió':          ['Leste Alagoano', 'Agreste Alagoano', 'Sertão Alagoano'],
+    'Macapá':          ['Sul do Amapá', 'Norte do Amapá'],
+    'Manaus':          ['Centro Amazonense', 'Norte Amazonense', 'Sul Amazonense', 'Sudoeste Amazonense'],
+    'Salvador':        ['Metropolitana de Salvador'],
+    'Fortaleza':       ['Metropolitana de Fortaleza', 'Norte Cearense', 'Jaguaribe'],
+    'Brasília':        ['Distrito Federal'],
+    'Vitória':         ['Central Espírito-santense', 'Noroeste Espírito-santense', 'Litoral Norte Espírito-santense', 'Sul Espírito-santense'],
+    'Goiânia':         ['Sul Goiano', 'Centro Goiano'],
+    'São Luís':        ['Norte Maranhense', 'Oeste Maranhense', 'Centro Maranhense', 'Leste Maranhense'],
+    'Cuiabá':          ['Centro-Sul Mato-grossense', 'Norte Mato-grossense', 'Sudeste Mato-grossense', 'Sudoeste Mato-grossense'],
+    'Campo Grande':    ['Centro Norte de Mato Grosso do Sul', 'Leste de Mato Grosso do Sul', 'Sudoeste de Mato Grosso do Sul', 'Pantanais Sul Mato-grossense', 'Centro-Sul Mato-grossense'],
+    'Belo Horizonte':  ['Metropolitana de Belo Horizonte'],
+    'Belém':           ['Metropolitana de Belém', 'Nordeste Paraense', 'Marajó', 'Sudeste Paraense', 'Sudoeste Paraense', 'Baixo Amazonas'],
+    'João Pessoa':     ['Mata Paraibana', 'Agreste Paraibano', 'Sertão Paraibano', 'Borborema'],
+    'Curitiba':        ['Metropolitana de Curitiba'],
+    'Recife':          ['Metropolitana de Recife', 'Mata Pernambucana', 'Agreste Pernambucano', 'Sertão Pernambucano'],
+    'Teresina':        ['Norte Piauiense', 'Centro-Norte Piauiense'],
+    'Rio de Janeiro':  ['Metropolitana do Rio de Janeiro', 'Baixadas', 'Centro Fluminense', 'Norte Fluminense', 'Noroeste Fluminense', 'Sul Fluminense'],
+    'Natal':           ['Leste Potiguar', 'Agreste Potiguar', 'Oeste Potiguar', 'Central Potiguar'],
+    'Porto Alegre':    ['Metropolitana de Porto Alegre'],
+    'Porto Velho':     ['Madeira-Guaporé', 'Leste Rondoniense'],
+    'Boa Vista':       ['Norte de Roraima', 'Sul de Roraima'],
+    'Florianópolis':   ['Grande Florianópolis', 'Norte Catarinense', 'Sul Catarinense', 'Vale do Itajaí', 'Oeste Catarinense', 'Serrana'],
+    'São Paulo':       ['Metropolitana de São Paulo', 'Macro Metropolitana Paulista', 'Vale do Paraíba Paulista'],
+    'Aracaju':         ['Leste Sergipano', 'Agreste Sergipano', 'Sertão Sergipano'],
+    'Palmas':          ['Oriental do Tocantins', 'Ocidental do Tocantins']
+};
+
+const SEVERIDADE_INMET = {
+    'Perigo Potencial': { level: 'warning', label: 'Alerta Amarelo', cor: '#f59e0b' },
+    'Perigo':           { level: 'danger',  label: 'Alerta Laranja', cor: '#f97316' },
+    'Grande Perigo':    { level: 'danger',  label: 'Alerta Vermelho', cor: '#ef4444' }
+};
 
 let estado = {
     carregando: false,
@@ -34,6 +75,7 @@ const dom = {
     errorText: document.getElementById('errorText'),
     cardsGrid: document.getElementById('cardsGrid'),
     btnRefresh: document.getElementById('btnRefresh'),
+    loadingCentral: document.getElementById('loadingCentral'),
     countDanger: document.getElementById('countDanger'),
     countWarning: document.getElementById('countWarning'),
     countSuccess: document.getElementById('countSuccess'),
@@ -109,6 +151,20 @@ function classificarRisco(temp, umidade, vento, precipitacao, weatherCode) {
     return { level: 'success', reason: 'Condições normais' };
 }
 
+function classificarRiscoFinal(temp, umidade, vento, precipitacao, weatherCode, alertas) {
+    if (alertas && alertas.length > 0) {
+        const temPerigo = alertas.some(a => {
+            const nivel = SEVERIDADE_INMET[a.severidade];
+            return nivel && nivel.level === 'danger';
+        });
+        if (temPerigo) {
+            return { level: 'danger', reason: 'Alerta INMET ativo' };
+        }
+        return { level: 'warning', reason: 'Alerta INMET ativo' };
+    }
+    return classificarRisco(temp, umidade, vento, precipitacao, weatherCode);
+}
+
 async function buscarClimaCidade(cidade) {
     const params = new URLSearchParams({
         latitude: cidade.lat,
@@ -136,21 +192,7 @@ async function buscarClimaCidade(cidade) {
         weatherCode: current.weather_code,
         icon: getIcon(current.weather_code),
         condition: getDesc(current.weather_code),
-        time: current.time,
-        risco: classificarRisco(
-            current.temperature_2m,
-            current.relative_humidity_2m,
-            current.wind_speed_10m,
-            current.precipitation || 0,
-            current.weather_code
-        ).level,
-        riscoReason: classificarRisco(
-            current.temperature_2m,
-            current.relative_humidity_2m,
-            current.wind_speed_10m,
-            current.precipitation || 0,
-            current.weather_code
-        ).reason
+        time: current.time
     };
 }
 
@@ -171,6 +213,118 @@ async function buscarTodasCidades() {
     }
 
     return { dados: resultados, erros, total: CIDADES.length, sucesso: resultados.length, falhas: erros.length };
+}
+
+async function buscarAlertasINMET() {
+    const url = 'https://apiprevmet3.inmet.gov.br/avisos/rss';
+    const resposta = await fetch(url);
+
+    if (!resposta.ok) {
+        throw new Error(`INMET HTTP ${resposta.status}`);
+    }
+
+    const xml = await resposta.text();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xml, 'text/xml');
+    const items = doc.querySelectorAll('item');
+    const alertas = [];
+    const agora = new Date();
+
+    items.forEach(item => {
+        const alerta = extrairDadosAlerta(item);
+        if (alerta && alerta.fim > agora) {
+            alertas.push(alerta);
+        }
+    });
+
+    return alertas;
+}
+
+function extrairDadosAlerta(item) {
+    try {
+        const descricaoHTML = item.querySelector('description')?.textContent || '';
+        const parser = new DOMParser();
+        const htmlDoc = parser.parseFromString(descricaoHTML, 'text/html');
+        const linhas = htmlDoc.querySelectorAll('table tr');
+        const dados = {};
+
+        linhas.forEach(tr => {
+            const th = tr.querySelector('th')?.textContent?.trim();
+            const td = tr.querySelector('td')?.textContent?.trim();
+            if (th && td) dados[th] = td;
+        });
+
+        const evento = dados['Evento'] || '';
+        const severidade = dados['Severidade'] || '';
+        const descricao = dados['Descrição'] || '';
+        const areaRaw = dados['Área'] || '';
+        const area = areaRaw.replace(/^Aviso para as Áreas:\s*/i, '');
+        const inicioStr = dados['Início'] || '';
+        const fimStr = dados['Fim'] || '';
+
+        const inicio = new Date(inicioStr.replace(' ', 'T'));
+        const fim = new Date(fimStr.replace(' ', 'T'));
+
+        if (isNaN(inicio.getTime()) || isNaN(fim.getTime())) return null;
+
+        const mapeado = SEVERIDADE_INMET[severidade];
+
+        return {
+            evento,
+            severidade,
+            descricao,
+            area,
+            inicio,
+            fim,
+            level: mapeado ? mapeado.level : 'warning',
+            label: mapeado ? mapeado.label : severidade,
+            cor: mapeado ? mapeado.cor : '#f59e0b',
+            orgao: 'INMET'
+        };
+    } catch (e) {
+        console.warn('Erro ao processar alerta INMET:', e);
+        return null;
+    }
+}
+
+function mapearAlertasParaCapitais(alertas) {
+    const mapa = {};
+    CIDADES.forEach(c => { mapa[c.nome] = []; });
+
+    alertas.forEach(alerta => {
+        if (!alerta.area) return;
+        CIDADES.forEach(c => {
+            const regioes = CAPITAL_MESOREGIOES[c.nome] || [];
+            const corresponde = regioes.some(r =>
+                alerta.area.toLowerCase().includes(r.toLowerCase())
+            );
+            if (corresponde) {
+                mapa[c.nome].push(alerta);
+            }
+        });
+    });
+
+    return mapa;
+}
+
+function combinarResultados(dadosMeteo, alertasPorCapital) {
+    return dadosMeteo.map(item => {
+        const alertas = alertasPorCapital[item.nome] || [];
+        const classificacao = classificarRiscoFinal(
+            item.temp,
+            item.humidity,
+            item.wind,
+            item.precipitation,
+            item.weatherCode,
+            alertas
+        );
+        return {
+            ...item,
+            risco: classificacao.level,
+            riscoReason: classificacao.reason,
+            alertas: alertas
+        };
+    });
 }
 
 function ordenarPorRisco(cidades) {
@@ -226,6 +380,23 @@ function renderizar(resultado) {
         const delay = index * 0.05;
         const dataHora = new Date(item.time).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 
+        let alertaHTML = '';
+        if (item.alertas && item.alertas.length > 0) {
+            const alerta = item.alertas[0];
+            const validoAte = alerta.fim.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            alertaHTML = `
+                <div class="card-alert" style="--alerta-cor: ${alerta.cor}">
+                    <div class="card-alerta-header">
+                        <span class="card-alerta-orgao"><i class="fas fa-exclamation-triangle"></i> ${alerta.orgao}</span>
+                        <span class="card-alerta-severidade" style="color: ${alerta.cor}">${alerta.label}</span>
+                    </div>
+                    <div class="card-alerta-evento">${alerta.evento}</div>
+                    <div class="card-alerta-descricao">${alerta.descricao}</div>
+                    <div class="card-alerta-validade">Válido até ${validoAte}</div>
+                </div>
+            `;
+        }
+
         html += `
             <div class="card" style="animation-delay: ${delay}s">
                 <span class="badge ${getRiskClass(item.risco)}">${getRiskLabel(item.risco)}</span>
@@ -243,6 +414,14 @@ function renderizar(resultado) {
                     <span class="detail"><i class="fas fa-water"></i> Cód: ${item.weatherCode}</span>
                 </div>
                 ${item.risco !== 'success' ? `<div class="card-reason"><i class="fas fa-info-circle"></i> ${item.riscoReason}</div>` : ''}
+                ${alertaHTML}
+                ${item.risco === 'success' ? `
+                <div class="card-stable">
+                    <div class="card-stable-header">Condições estáveis</div>
+                    <div class="card-stable-line">Sem alerta INMET ativo</div>
+                    <div class="card-stable-line">Temperatura, vento e chuva dentro da normalidade</div>
+                </div>
+                ` : ''}
             </div>
         `;
     });
@@ -277,6 +456,12 @@ function mostrarLoading(ativo) {
     dom.btnRefresh.innerHTML = ativo
         ? '<i class="fas fa-spinner fa-spin"></i> Carregando...'
         : '<i class="fas fa-sync-alt"></i> Atualizar';
+
+    dom.loadingCentral.classList.toggle('hidden', !ativo);
+    if (ativo) {
+        dom.cardsGrid.innerHTML = '';
+        dom.error.classList.remove('active');
+    }
 }
 
 function mostrarErro(mensagem) {
@@ -294,21 +479,37 @@ async function carregarDados() {
 
     try {
         esconderErro();
+        estado.filtroAtivo = 'all';
+        dom.statusItems.forEach(item => {
+            item.classList.toggle('active', item.dataset.filter === 'all');
+        });
         mostrarLoading(true);
-        aplicarFiltro('all');
 
-        const resultado = await buscarTodasCidades();
+        const [resultadoMeteo, alertasINMET] = await Promise.all([
+            buscarTodasCidades(),
+            buscarAlertasINMET().catch(err => {
+                console.warn('INMET indisponível, usando apenas dados meteorológicos:', err.message);
+                return [];
+            })
+        ]);
 
-        if (resultado.dados.length === 0) {
-            const msg = resultado.erros[0]?.erro || 'Erro ao conectar com o servidor.';
+        if (resultadoMeteo.dados.length === 0) {
+            const msg = resultadoMeteo.erros[0]?.erro || 'Erro ao conectar com o servidor.';
             throw new Error(`Nenhuma cidade carregada. ${msg}`);
         }
 
-        estado.dados = resultado.dados;
-        renderizar(resultado);
+        const alertasPorCapital = mapearAlertasParaCapitais(alertasINMET);
+        const dadosCombinados = combinarResultados(resultadoMeteo.dados, alertasPorCapital);
 
-        if (resultado.falhas > 0) {
-            console.warn(`${resultado.falhas} cidades falharam:`, resultado.erros);
+        estado.dados = dadosCombinados;
+        renderizar({ dados: dadosCombinados, falhas: resultadoMeteo.falhas });
+
+        if (alertasINMET.length > 0) {
+            console.log(`⚠️ ${alertasINMET.length} alertas INMET ativos`);
+        }
+
+        if (resultadoMeteo.falhas > 0) {
+            console.warn(`${resultadoMeteo.falhas} cidades falharam:`, resultadoMeteo.erros);
         }
     } catch (erro) {
         console.error('Erro:', erro);
@@ -339,7 +540,17 @@ dom.btnRefresh.addEventListener('click', carregarDados);
 carregarDados();
 setInterval(carregarDados, 300000);
 
-console.log('🌤️ Monitor de Risco Climático - Brasil (Open-Meteo)');
-console.log(`📍 ${CIDADES.length} cidades configuradas`);
-console.log('🔄 Sem necessidade de chave API!');
+const btnTop = document.getElementById('btnTop');
+
+window.addEventListener('scroll', () => {
+    btnTop.classList.toggle('visible', window.scrollY > 300);
+});
+
+btnTop.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+console.log('🌤️ Monitor de Risco Climático - Capitais do Brasil (Open-Meteo + INMET)');
+console.log(`📍 ${CIDADES.length} capitais configuradas`);
+console.log('⚠️ Alertas INMET integrados via RSS oficial');
 console.log('🔄 Atualização automática a cada 5 minutos');
