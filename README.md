@@ -1,6 +1,6 @@
 # 🌤️ Monitor de Risco Climático - Brasil
 
-Aplicação web standalone que acompanha as condições climáticas das principais cidades brasileiras e classifica cada uma por nível de risco (Perigo, Atenção, Seguro).
+Aplicação web standalone que monitora as **27 capitais brasileiras** e classifica cada uma por nível de risco (Perigo, Atenção, Seguro), combinando dados meteorológicos da Open-Meteo com **alertas oficiais do INMET**.
 
 ## 🚀 Como usar
 
@@ -10,34 +10,49 @@ Ou localmente:
 
 1. **Abra o arquivo** `index.html` em qualquer navegador moderno
 2. Os dados carregam automaticamente — **sem necessidade de chave API**
-3. Use os filtros na barra de status para ver cidades por nível de risco
+3. Use os chips de filtro na barra de status para filtrar por nível de risco
 
-### Botões
+### Interface
 
-| Botão | Ação |
-|-------|------|
-| 🔄 **Atualizar** | Recarrega os dados de todas as cidades |
-| 🔴 **Perigo** | Filtra apenas cidades em situação de perigo |
-| 🟡 **Atenção** | Filtra apenas cidades em atenção |
-| 🟢 **Seguro** | Filtra apenas cidades seguras |
-| 🏙️ **Total** | Mostra todas as cidades |
+| Elemento | Função |
+|----------|--------|
+| 🔄 **Atualizar** | Recarrega os dados de todas as capitais |
+| 🔴 **Perigo** / 🟡 **Atenção** / 🟢 **Seguro** | Chips clicáveis — filtram cidades pelo risco |
+| 📋 **Total** | Contador informativo de todas as capitais |
+| ⬆️ **Back to Top** | Botão flutuante que aparece ao rolar a página |
+| ⏳ Loading central | Spinner exibido durante o carregamento inicial |
 
-## 📡 API
+## 📡 APIs Utilizadas
 
-Utiliza a [Open-Meteo](https://open-meteo.com/) — API pública, gratuita e sem necessidade de cadastro ou chave.
+### Open-Meteo (dados meteorológicos)
+API pública, gratuita e sem necessidade de cadastro.
 
 **Endpoint:** `https://api.open-meteo.com/v1/forecast`
 
-**Dados coletados por cidade:**
+**Dados coletados por capital:**
 - Temperatura (°C)
 - Umidade relativa (%)
 - Velocidade do vento (km/h)
 - Precipitação (mm)
 - Código climático WMO
 
+### INMET (alertas oficiais)
+Alertas meteorológicos oficiais consumidos via RSS.
+
+**Endpoint:** `https://apiprevmet3.inmet.gov.br/avisos/rss`
+
+Os alertas são mapeados para as capitais por mesorregiões IBGE. Em caso de indisponibilidade do INMET, o sistema opera apenas com dados Open-Meteo (degradação graciosa).
+
 ## ⚠️ Classificação de Risco
 
-### 🔴 Perigo (Vermelho)
+A classificação final combina duas camadas:
+
+1. **Alerta INMET ativo** → prioridade máxima
+   - Alerta Vermelho/Laranja → **Perigo**
+   - Alerta Amarelo → **Atenção**
+2. **Classificação meteorológica** (fallback quando não há alerta)
+
+### 🔴 Perigo
 | Condição | Critério |
 |----------|----------|
 | Tempestade | Código WMO ≥ 95 |
@@ -45,15 +60,15 @@ Utiliza a [Open-Meteo](https://open-meteo.com/) — API pública, gratuita e sem
 | Chuva forte | Código 65, 82 ou 67 |
 | Precipitação intensa | > 50mm |
 
-### 🟡 Atenção (Amarelo)
+### 🟡 Atenção
 | Condição | Critério |
 |----------|----------|
 | Calor elevado | Temperatura > 32°C |
 | Ventos fortes | > 50 km/h |
 | Umidade baixa | < 30% |
 
-### 🟢 Seguro (Verde)
-Condições dentro da normalidade.
+### 🟢 Seguro
+Condições dentro da normalidade. Exibe seção informativa "✅ Condições estáveis" no card.
 
 ## 📂 Estrutura
 
@@ -63,25 +78,30 @@ clima-tempo/
 ├── css/
 │   └── style.css    # Estilos (tema escuro, responsivo)
 ├── js/
-│   └── app.js       # Lógica (API, classificação, filtros)
+│   └── app.js       # Lógica (APIs, classificação, filtros, UI)
 └── README.md
 ```
 
 ## 🛠️ Stack
 
 - **HTML5** semântico
-- **CSS3** com variáveis, Grid e Flexbox
-- **JavaScript ES6+** (async/await, fetch)
+- **CSS3** com variáveis, Grid, Flexbox e media queries
+- **JavaScript ES6+** (async/await, fetch, DOMParser)
 - **Font Awesome 6** via CDN
 - **Zero frameworks** — código puro e leve
 
 ## 📱 Responsivo
 
-| Dispositivo | Grid |
-|-------------|------|
-| Desktop | Múltiplas colunas (auto-fill) |
-| Tablet | 2 colunas |
-| Mobile | 1 coluna |
+| Dispositivo | Grid de cards |
+|-------------|--------------|
+| Desktop (≥ 1024px) | 3 colunas |
+| Tablet (≥ 640px) | 2 colunas |
+| Mobile (< 480px) | 1 coluna |
+
+Funcionalidades adaptadas:
+- Título dobra linha sem hífen no mobile
+- Botão Back to Top reposicionado em telas maiores
+- Chips de filtro com wrap para caber em qualquer largura
 
 ## 🔄 Atualização automática
 
@@ -89,4 +109,4 @@ Os dados são atualizados automaticamente a cada **5 minutos**.
 
 ---
 
-<sub>Dados fornecidos por [Open-Meteo](https://open-meteo.com/) • Design dark mode com paleta Slate</sub>
+<sub>Dados meteorológicos por [Open-Meteo](https://open-meteo.com/) • Alertas oficiais pelo [INMET](https://www.inmet.gov.br/) • Design dark mode • Desenvolvido com IAs</sub>
