@@ -79,6 +79,7 @@ const dom = {
     countDanger: document.getElementById('countDanger'),
     countWarning: document.getElementById('countWarning'),
     countSuccess: document.getElementById('countSuccess'),
+    countError: document.getElementById('countError'),
     countTotal: document.getElementById('countTotal'),
     statusItems: document.querySelectorAll('.status-item[data-filter]')
 };
@@ -120,7 +121,7 @@ function getDesc(code) {
 }
 
 function getRiskLabel(risco) {
-    const mapa = { danger: 'Perigo', warning: 'Atenção', success: 'Seguro' };
+    const mapa = { danger: 'Perigo', warning: 'Atenção', success: 'Seguro', error: 'Indisponível' };
     return mapa[risco] || 'Seguro';
 }
 
@@ -197,7 +198,7 @@ async function buscarClimaCidade(cidade) {
 }
 
 async function buscarTodasCidades() {
-    const resultados = [];
+    const sucessos = [];
     const erros = [];
 
     const lote = 5;
@@ -205,14 +206,25 @@ async function buscarTodasCidades() {
         const batch = CIDADES.slice(i, i + lote);
         const promises = batch.map(c =>
             buscarClimaCidade(c)
-                .then(r => resultados.push(r))
+                .then(r => sucessos.push(r))
                 .catch(err => erros.push({ cidade: c.nome, erro: err.message }))
         );
         await Promise.all(promises);
         await new Promise(resolve => setTimeout(resolve, 300));
     }
 
-    return { dados: resultados, erros, total: CIDADES.length, sucesso: resultados.length, falhas: erros.length };
+    const dados = CIDADES.map(c => {
+        const ok = sucessos.find(r => r.nome === c.nome);
+        if (ok) return ok;
+        const falha = erros.find(e => e.cidade === c.nome);
+        return {
+            nome: c.nome,
+            erro: falha ? falha.erro : 'Erro desconhecido',
+            _falhou: true
+        };
+    });
+
+    return { dados, erros, total: CIDADES.length, sucesso: sucessos.length, falhas: erros.length };
 }
 
 async function buscarAlertasINMET() {
@@ -309,6 +321,9 @@ function mapearAlertasParaCapitais(alertas) {
 
 function combinarResultados(dadosMeteo, alertasPorCapital) {
     return dadosMeteo.map(item => {
+        if (item._falhou) {
+            return { ...item, risco: 'error', riscoReason: item.erro || 'Indisponível', alertas: [] };
+        }
         const alertas = alertasPorCapital[item.nome] || [];
         const classificacao = classificarRiscoFinal(
             item.temp,
@@ -328,7 +343,7 @@ function combinarResultados(dadosMeteo, alertasPorCapital) {
 }
 
 function ordenarPorRisco(cidades) {
-    const ordem = { danger: 0, warning: 1, success: 2 };
+    const ordem = { danger: 0, warning: 1, success: 2, error: 3 };
     return [...cidades].sort((a, b) => ordem[a.risco] - ordem[b.risco]);
 }
 
@@ -336,12 +351,12 @@ function renderizar(resultado) {
     const grid = dom.cardsGrid;
     const dados = resultado.dados;
 
-    if (dados.length === 0) {
+    if (resultado.sucesso !== undefined && resultado.sucesso === 0) {
         grid.innerHTML = `
             <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-light);">
                 <p style="font-size: 48px; margin-bottom: 16px;">🌧️</p>
                 <h3>Nenhuma cidade carregada</h3>
-                <p>Tente novamente mais tarde.</p>
+                <p>${dados[0]?.erro || 'Tente novamente mais tarde.'}</p>
             </div>
         `;
         return;
@@ -352,13 +367,15 @@ function renderizar(resultado) {
     const counts = {
         danger: dados.filter(d => d.risco === 'danger').length,
         warning: dados.filter(d => d.risco === 'warning').length,
-        success: dados.filter(d => d.risco === 'success').length
+        success: dados.filter(d => d.risco === 'success').length,
+        error: dados.filter(d => d.risco === 'error').length
     };
 
     dom.countDanger.textContent = counts.danger;
     dom.countWarning.textContent = counts.warning;
     dom.countSuccess.textContent = counts.success;
-    dom.countTotal.textContent = dados.length;
+    dom.countError.textContent = counts.error;
+    dom.countTotal.textContent = CIDADES.length;
 
     const filtrados = estado.filtroAtivo === 'all'
         ? ordenados
@@ -368,8 +385,8 @@ function renderizar(resultado) {
         grid.innerHTML = `
             <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-light);">
                 <p style="font-size: 48px; margin-bottom: 16px;">🔍</p>
-                <h3>Nenhuma cidade em "${getRiskLabel(estado.filtroAtivo)}"</h3>
-                <p>Clique em outro filtro para ver outras regiões.</p>
+                <h3>Tudo certo por aqui! Nenhuma cidade está "${getRiskLabel(estado.filtroAtivo)}"</h3>
+                <p>Clique em outro filtro para explorar as demais regiões.</p>
             </div>
         `;
         return;
@@ -378,6 +395,22 @@ function renderizar(resultado) {
     let html = '';
     filtrados.forEach((item, index) => {
         const delay = index * 0.05;
+
+        if (item._falhou) {
+            html += `
+            <div class="card" style="animation-delay: ${delay}s">
+                <span class="badge error">Indisponível</span>
+                <div class="card-city">${item.nome}</div>
+                <div class="card-state">Brasil</div>
+                <div class="card-reason" style="margin-top: 10px;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    Não foi possível obter os dados desta capital no momento.
+                </div>
+            </div>
+            `;
+            return;
+        }
+
         const dataHora = new Date(item.time).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 
         let alertaHTML = '';
@@ -427,27 +460,6 @@ function renderizar(resultado) {
     });
 
     grid.innerHTML = html;
-
-    if (resultado.falhas > 0) {
-        const aviso = document.createElement('div');
-        aviso.style.cssText = `
-            grid-column: 1/-1;
-            background: #3b2a06;
-            border: 2px solid #a16207;
-            border-radius: 12px;
-            padding: 12px 20px;
-            text-align: center;
-            color: #fde68a;
-            font-size: 14px;
-        `;
-        aviso.innerHTML = `
-            ⚠️ ${resultado.falhas} cidade(s) não puderam ser carregadas.
-            <button onclick="carregarDados()" style="background:none;border:none;color:#4a6cf7;cursor:pointer;font-weight:600;text-decoration:underline;">
-                Tentar novamente
-            </button>
-        `;
-        grid.prepend(aviso);
-    }
 }
 
 function mostrarLoading(ativo) {
@@ -488,12 +500,23 @@ async function carregarDados() {
         const [resultadoMeteo, alertasINMET] = await Promise.all([
             buscarTodasCidades(),
             buscarAlertasINMET().catch(err => {
-                console.warn('INMET indisponível, usando apenas dados meteorológicos:', err.message);
+                console.warn('⚠️ INMET indisponível — usando apenas dados meteorológicos:', err.message);
                 return [];
             })
         ]);
 
-        if (resultadoMeteo.dados.length === 0) {
+        console.log(`📍 Open-Meteo: ${resultadoMeteo.sucesso}/${CIDADES.length} capitais carregadas, ${resultadoMeteo.falhas} falha(s)`);
+        if (resultadoMeteo.falhas > 0) {
+            console.warn('❌ Falhas Open-Meteo:', resultadoMeteo.erros.map(e => `${e.cidade} (${e.erro})`).join('; '));
+        }
+
+        if (alertasINMET.length > 0) {
+            console.log(`⚠️ INMET: ${alertasINMET.length} alerta(s) ativo(s)`);
+        } else {
+            console.log('ℹ️ INMET: nenhum alerta ativo no momento');
+        }
+
+        if (resultadoMeteo.sucesso === 0) {
             const msg = resultadoMeteo.erros[0]?.erro || 'Erro ao conectar com o servidor.';
             throw new Error(`Nenhuma cidade carregada. ${msg}`);
         }
@@ -502,15 +525,7 @@ async function carregarDados() {
         const dadosCombinados = combinarResultados(resultadoMeteo.dados, alertasPorCapital);
 
         estado.dados = dadosCombinados;
-        renderizar({ dados: dadosCombinados, falhas: resultadoMeteo.falhas });
-
-        if (alertasINMET.length > 0) {
-            console.log(`⚠️ ${alertasINMET.length} alertas INMET ativos`);
-        }
-
-        if (resultadoMeteo.falhas > 0) {
-            console.warn(`${resultadoMeteo.falhas} cidades falharam:`, resultadoMeteo.erros);
-        }
+        renderizar({ dados: dadosCombinados, sucesso: resultadoMeteo.sucesso, falhas: resultadoMeteo.falhas });
     } catch (erro) {
         console.error('Erro:', erro);
         mostrarErro(erro.message);
